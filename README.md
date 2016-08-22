@@ -28,6 +28,18 @@ A sample project is available on GitHub, can be [browsed](https://github.com/Son
  - copy the jar (in the new generated target folder) in <path_to_your_sonar_install>/extensions/plugins folder,
  - restart sonar
 
+## Upgrade Android Lint
+ 1. Change `lint.version` in `pom.xml`
+ 2. Ensure `lint-rules-gen` compilesq now and fix issues: `mvn validate`
+ 3. Run `lint-rules-gen` - `mvn exeqc:java`
+ 4. copy the generated XML to the correct location
+     `cp lint-rules-gen/out/org/sonar/plugins/android/lint/android_lint_sonar_way.xml
+     sonar-android-plugin/src/main/resources/org/sonar/plugins/android/lint/android_lint_sonar_way.xml`
+     `cp lint-rules-gen/out/org/sonar/plugins/android/lint/rules.xml
+     sonar-android-plugin/src/main/resources/org/sonar/plugins/android/lint/rules.xml`
+ 5. go to `its/plugin/projects/SonarAndroidSample` and run `gradlew lint`
+ 6. Run the tests
+
 ## Running an analyse:
 1. On a Maven project
  - mvn sonar:sonar -Dsonar.profile="Android Lint" in your project
