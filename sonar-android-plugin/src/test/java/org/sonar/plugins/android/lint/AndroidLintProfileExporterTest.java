@@ -19,7 +19,14 @@
  */
 package org.sonar.plugins.android.lint;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Lists;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.CharUtils;
 import org.custommonkey.xmlunit.Diff;
@@ -46,12 +53,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class AndroidLintProfileExporterTest {
 
   @Test
@@ -68,7 +69,7 @@ public class AndroidLintProfileExporterTest {
     RulesProfile rulesProfileWithActiveRules = createRulesProfileWithActiveRules(rules);
     new AndroidLintProfileExporter().exportProfile(rulesProfileWithActiveRules, sw);
     String output = sw.toString();
-    assertThat(nbOfIssues(output)).isEqualTo(158);
+    assertThat(nbOfIssues(output)).isEqualTo(254);
     assertXmlAreSimilar(output, "exporter/lint.xml");
   }
 
@@ -80,7 +81,7 @@ public class AndroidLintProfileExporterTest {
     when(ruleFinder.findAll(any(RuleQuery.class))).thenReturn(createAPIRule(rules));
     new AndroidLintProfileExporter().exportProfile(RulesProfile.create(), sw);
     String output = sw.toString();
-    assertThat(nbOfIssues(output)).isEqualTo(158);
+    assertThat(nbOfIssues(output)).isEqualTo(254);
     assertXmlAreSimilar(output, "exporter/lint-ignore.xml");
   }
 
@@ -108,7 +109,8 @@ public class AndroidLintProfileExporterTest {
 
   private List<RulesDefinition.Rule> createRules() {
     RulesDefinition.Context context = new RulesDefinition.Context();
-    new AndroidLintRulesDefinition(new RulesDefinitionXmlLoader()).define(context);
+    new AndroidLintRulesDefinition(new RulesDefinitionXmlLoader()).define(context,
+        "/test-rules.xml");
     return context.repository("android-lint").rules();
   }
 

@@ -19,15 +19,15 @@
  */
 package org.sonar.plugins.android.lint;
 
-import org.junit.Test;
-
 import static org.fest.assertions.Assertions.assertThat;
+
+import org.junit.Test;
 
 public class AndroidLintVersionTest {
 
   @Test
   public void testGetVersion() {
-    assertThat(AndroidLintVersion.getVersion()).isEqualTo("22.2.0");
+    assertThat(AndroidLintVersion.getVersion()).isEqualTo("25.1.2");
 
     assertThat(AndroidLintVersion.readVersion("/foo/bar")).isEqualTo("");
   }

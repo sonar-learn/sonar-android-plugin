@@ -19,12 +19,16 @@
  */
 package org.sonar.plugins.android.lint;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import com.android.tools.lint.checks.BuiltinIssueRegistry;
 import com.android.tools.lint.client.api.IssueRegistry;
 import com.android.tools.lint.detector.api.Category;
 import com.android.tools.lint.detector.api.Issue;
+import com.android.tools.lint.detector.api.TextFormat;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.sonar.api.server.rule.RulesDefinition;
@@ -34,8 +38,6 @@ import org.sonar.api.server.rule.RulesDefinitionXmlLoader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * This class tests the AndroidLintRuleRepository class
@@ -59,9 +61,9 @@ public class AndroidLintRulesDefinitionTest {
 
   @Test
   public void createRulesTest() {
-    RulesDefinition rulesDefinition = new AndroidLintRulesDefinition(new RulesDefinitionXmlLoader());
+    AndroidLintRulesDefinition rulesDefinition = new AndroidLintRulesDefinition(new RulesDefinitionXmlLoader());
     RulesDefinition.Context context = new RulesDefinition.Context();
-    rulesDefinition.define(context);
+    rulesDefinition.define(context, "/test-rules.xml");
     RulesDefinition.Repository repository = context.repository(AndroidLintRulesDefinition.REPOSITORY_KEY);
     List<RulesDefinition.Rule> rules = repository.rules();
     assertThat(rules.size()).isEqualTo(158);
@@ -89,7 +91,7 @@ public class AndroidLintRulesDefinitionTest {
         + StringUtils.rightPad(issue.getCategory().getFullName(), 22)
         + StringUtils.rightPad(SQALE_BY_LINT_CATEGORY.get(issue.getCategory()), 30)
         + StringUtils.rightPad(rule.key(), 30)
-        + issue.getDescription(Issue.OutputFormat.TEXT);
+        + issue.getBriefDescription(TextFormat.TEXT);
   }
 
 }
