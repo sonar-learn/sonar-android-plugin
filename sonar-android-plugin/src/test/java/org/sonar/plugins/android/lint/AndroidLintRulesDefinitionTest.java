@@ -70,6 +70,7 @@ public class AndroidLintRulesDefinitionTest {
     RulesDefinition.Repository repository = context.repository(AndroidLintRulesDefinition.REPOSITORY_KEY);
     List<RulesDefinition.Rule> rules = repository.rules();
     assertThat(rules.size()).isEqualTo(254);
+    assertThat(rules.get(1).tags().size() > 0);
 
     List<RuleIssue> errorMessageOfMissingSqale = Lists.newArrayList();
     IssueRegistry registry = new BuiltinIssueRegistry();

@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -97,7 +98,8 @@ public class SonarRulesGenerator {
   private void setTags(@Nullable Category category, DtoRule dtoRule) {
     if (category != null) {
       setTags(category.getParent(), dtoRule);
-      dtoRule.addTag(category.getName());
+      dtoRule.addTag(category.getName().toLowerCase(Locale.ENGLISH)
+          .replaceAll("[^a-z0-9+#.-]", "-"));
     }
   }
 
