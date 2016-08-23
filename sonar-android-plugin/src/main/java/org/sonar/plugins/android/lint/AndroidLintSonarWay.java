@@ -41,10 +41,6 @@ public class AndroidLintSonarWay extends ProfileDefinition {
 
   @Override
   public RulesProfile createProfile(ValidationMessages validationMessages) {
-    createProfile(validationMessages, PROFILE_XML_PATH);
-  }
-
-  RulesProfile createProfile(ValidationMessages validationMessages, String profileXmlPath) {
     InputStream input = getClass().getResourceAsStream(PROFILE_XML_PATH);
     InputStreamReader reader = new InputStreamReader(input, Charsets.UTF_8);
     try {

@@ -74,11 +74,11 @@ public class AndroidLintProfileExporter extends ProfileExporter {
    */
   AndroidLintProfileExporter(String rulesXmlPath) {
     super(AndroidLintRulesDefinition.REPOSITORY_KEY, AndroidLintRulesDefinition.REPOSITORY_NAME);
+    this.rulesXmlPath = rulesXmlPath;
     ruleKeys = Lists.newArrayList();
     loadRuleKeys();
     setSupportedLanguages("java", "xml");
     setMimeType(MediaType.XML_UTF_8.toString());
-    this.rulesXmlPath = rulesXmlPath;
   }
 
   private void loadRuleKeys() {

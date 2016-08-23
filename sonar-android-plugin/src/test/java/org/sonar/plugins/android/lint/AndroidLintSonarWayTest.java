@@ -49,8 +49,7 @@ public class AndroidLintSonarWayTest {
       );
     AndroidLintSonarWay sonarWay = new AndroidLintSonarWay(new XMLProfileParser(ruleFinder));
 
-    RulesProfile profile = sonarWay.createProfile(ValidationMessages.create(),
-        "/test_android_lint_sonar_way.xml");
+    RulesProfile profile = sonarWay.createProfile(ValidationMessages.create());
 
     assertThat(profile.getActiveRules().size()).isEqualTo(239);
   }

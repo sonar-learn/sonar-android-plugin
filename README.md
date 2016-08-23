@@ -38,7 +38,9 @@ A sample project is available on GitHub, can be [browsed](https://github.com/Son
      `cp lint-rules-gen/out/org/sonar/plugins/android/lint/rules.xml
      sonar-android-plugin/src/main/resources/org/sonar/plugins/android/lint/rules.xml`
  5. go to `its/plugin/projects/SonarAndroidSample` and run `gradlew lint`
- 6. Run the tests
+ 6. Run the tests `mvn clean install`
+ 7. Add missing rules to: `sonar-android-plugin/src/main/resources/org/sonar/plugins/android/lint
+ /java-model.xml`
 
 ## Running an analyse:
 1. On a Maven project
