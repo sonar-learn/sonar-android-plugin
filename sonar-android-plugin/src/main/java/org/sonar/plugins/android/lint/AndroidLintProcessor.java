@@ -26,12 +26,11 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.component.ResourcePerspectives;
-import org.sonar.api.issue.Issuable;
-import org.sonar.api.issue.Issue;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;
 import org.sonar.api.profiles.RulesProfile;
+import org.sonar.api.rule.RuleKey;
 import org.sonar.api.rules.ActiveRule;
 
 import java.io.File;
@@ -40,14 +39,12 @@ import java.util.List;
 public class AndroidLintProcessor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AndroidLintProcessor.class);
+  private final SensorContext context;
   private final RulesProfile profile;
-  private final ResourcePerspectives perspectives;
-  private final FileSystem fs;
 
-  public AndroidLintProcessor(RulesProfile profile, ResourcePerspectives perspectives, FileSystem fs) {
+  public AndroidLintProcessor(SensorContext context, RulesProfile profile) {
+    this.context = context;
     this.profile = profile;
-    this.perspectives = perspectives;
-    this.fs = fs;
   }
 
   public void process(File lintXml) {
@@ -76,19 +73,18 @@ public class AndroidLintProcessor {
   }
 
   private void processIssueForLocation(ActiveRule rule, LintIssue lintIssue, LintLocation lintLocation) {
-    InputFile inputFile = fs.inputFile(fs.predicates().hasPath(lintLocation.file));
+    InputFile inputFile = this.context.fileSystem().inputFile(this.context.fileSystem().predicates().hasPath(lintLocation.file));
     if (inputFile != null) {
       LOGGER.debug("Processing File {} for Issue {}", lintLocation.file, lintIssue.id);
-      Issuable issuable = perspectives.as(Issuable.class, inputFile);
-      if (issuable != null) {
-        Issue issue = issuable.newIssueBuilder()
-          .ruleKey(rule.getRule().ruleKey())
-            .message(lintIssue.message)
-            .line(lintLocation.line)
-            .build();
-        issuable.addIssue(issue);
-        return;
-      }
+      DefaultIssueLocation dil = new DefaultIssueLocation()
+              .on(inputFile)
+              .at(inputFile.selectLine(lintLocation.line))
+              .message(lintIssue.message);
+      this.context.newIssue()
+              .forRule(RuleKey.of(rule.getRepositoryKey(), rule.getRuleKey()))
+              .at(dil)
+              .save();
+      return;
     }
     LOGGER.warn("Unable to find file {} to report issue", lintLocation.file);
   }

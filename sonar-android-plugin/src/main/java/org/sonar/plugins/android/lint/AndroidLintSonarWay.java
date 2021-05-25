@@ -19,34 +19,42 @@
  */
 package org.sonar.plugins.android.lint;
 
-import com.google.common.base.Charsets;
-import org.apache.commons.io.IOUtils;
-import org.sonar.api.profiles.ProfileDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.profiles.RulesProfile;
-import org.sonar.api.profiles.XMLProfileParser;
+import org.sonar.api.rules.ActiveRule;
+import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 import org.sonar.api.utils.ValidationMessages;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
-public class AndroidLintSonarWay extends ProfileDefinition {
-
+public class AndroidLintSonarWay implements BuiltInQualityProfilesDefinition {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AndroidLintSonarWay.class);
   public static final String PROFILE_XML_PATH = "/org/sonar/plugins/android/lint/android_lint_sonar_way.xml";
 
-  private final XMLProfileParser parser;
+  private final AndroidLintProfileImporter profileImporter;
 
-  public AndroidLintSonarWay(XMLProfileParser parser) {
-    this.parser = parser;
+  public AndroidLintSonarWay(final AndroidLintProfileImporter profileImporter) {
+    this.profileImporter = profileImporter;
   }
 
   @Override
-  public RulesProfile createProfile(ValidationMessages validationMessages) {
-    InputStream input = getClass().getResourceAsStream(PROFILE_XML_PATH);
-    InputStreamReader reader = new InputStreamReader(input, Charsets.UTF_8);
-    try {
-      return parser.parse(reader, validationMessages);
-    } finally {
-      IOUtils.closeQuietly(reader);
+  public void define(Context context) {
+    LOGGER.info("Creating Objective-C Profile");
+
+    NewBuiltInQualityProfile nbiqp = context.createBuiltInQualityProfile("Android Lint", "java");
+    nbiqp.setDefault(true);
+
+    try(Reader config = new InputStreamReader(getClass().getResourceAsStream(PROFILE_XML_PATH))) {
+      RulesProfile ocLintRulesProfile = this.profileImporter.importProfile(config, ValidationMessages.create());
+      for (ActiveRule rule : ocLintRulesProfile.getActiveRules()) {
+        nbiqp.activateRule(rule.getRepositoryKey(), rule.getRuleKey());
+      }
+    } catch (IOException ex){
+      LOGGER.error("Error Creating AndroidLint Profile",ex);
     }
+    nbiqp.done();
   }
 }

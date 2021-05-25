@@ -19,16 +19,15 @@
  */
 package org.sonar.plugins.android;
 
-import com.google.common.collect.ImmutableList;
+import org.sonar.api.Plugin;
 import org.sonar.api.Property;
-import org.sonar.api.SonarPlugin;
 import org.sonar.plugins.android.lint.AndroidLintProfileExporter;
 import org.sonar.plugins.android.lint.AndroidLintProfileImporter;
 import org.sonar.plugins.android.lint.AndroidLintRulesDefinition;
 import org.sonar.plugins.android.lint.AndroidLintSensor;
 import org.sonar.plugins.android.lint.AndroidLintSonarWay;
 
-import java.util.List;
+import java.util.Arrays;
 
 @Property(
   key = AndroidPlugin.LINT_REPORT_PROPERTY,
@@ -38,19 +37,21 @@ import java.util.List;
   project = true,
   module = true,
   global = false)
-public class AndroidPlugin extends SonarPlugin {
+public class AndroidPlugin implements Plugin {
 
   public static final String LINT_REPORT_PROPERTY = "sonar.android.lint.report";
   public static final String LINT_REPORT_PROPERTY_DEFAULT = "build/outputs/lint-results.xml";
 
   @Override
-  public List getExtensions() {
-    return ImmutableList.of(
-      AndroidLintSensor.class,
-      AndroidLintRulesDefinition.class,
-      AndroidLintSonarWay.class,
-      AndroidLintProfileExporter.class,
-      AndroidLintProfileImporter.class
-      );
+  public void define(Context context) {
+    context.addExtensions(
+            Arrays.asList(
+                    AndroidLintProfileExporter.class,
+                    AndroidLintProfileImporter.class,
+                    AndroidLintRulesDefinition.class,
+                    AndroidLintSensor.class,
+                    AndroidLintSonarWay.class
+            )
+    );
   }
 }

@@ -20,11 +20,11 @@
 package org.sonar.plugins.android.lint;
 
 import com.google.common.base.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinitionXmlLoader;
 import org.sonar.squidbridge.rules.SqaleXmlLoader;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -48,13 +48,13 @@ public class AndroidLintRulesDefinition implements RulesDefinition {
   void define(Context context, String rulesXmlPaths) {
     NewRepository repository = context.createRepository(REPOSITORY_KEY, "java").setName(REPOSITORY_NAME);
     InputStream inputStream = getClass().getResourceAsStream(rulesXmlPaths);
-    InputStreamReader reader = new InputStreamReader(inputStream, Charsets.UTF_8);
-    try {
+
+    try (InputStreamReader reader = new InputStreamReader(inputStream, Charsets.UTF_8)) {
       xmlLoader.load(repository, reader);
       SqaleXmlLoader.load(repository, "/org/sonar/plugins/android/lint/java-model.xml");
       repository.done();
-    } finally {
-      IOUtils.closeQuietly(reader);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 }

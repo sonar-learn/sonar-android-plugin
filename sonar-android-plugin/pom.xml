@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.sonarsource.android</groupId>
     <artifactId>sonar-android</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
   </parent>
 
   <artifactId>sonar-android-plugin</artifactId>
@@ -15,18 +15,49 @@
   <description>Import Android Lint reports.</description>
 
   <properties>
-    <sonar.version>4.5.4</sonar.version>
+    <lint.version>25.1.2</lint.version>
+    <sonar.version>7.7</sonar.version>
+    <sslr-squid-bridge.version>2.6.1</sslr-squid-bridge.version>
+    <commons-logging.version>1.1.1</commons-logging.version>
+    <slf4j.version>1.7.25</slf4j.version>
+    <simplexml.version>2.7.1</simplexml.version>
+    <staxmate.version>2.0.1</staxmate.version>
     <!-- Configuration for sonar-packaging-maven-plugin -->
     <sonar.pluginClass>org.sonar.plugins.android.AndroidPlugin</sonar.pluginClass>
     <sonar.pluginName>Android Lint</sonar.pluginName>
-    <sonar.requirePlugins>java:${sonar-java.version}</sonar.requirePlugins>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.codehaus.sonar.sslr-squid-bridge</groupId>
+      <groupId>org.sonarsource.sslr-squid-bridge</groupId>
       <artifactId>sslr-squid-bridge</artifactId>
-      <version>2.6</version>
+      <version>${sslr-squid-bridge.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.sonar.sslr</groupId>
+          <artifactId>sslr-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.sonar.sslr</groupId>
+          <artifactId>sslr-xpath</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.sonar</groupId>
+          <artifactId>sonar-plugin-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.picocontainer</groupId>
+          <artifactId>picocontainer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>emma</groupId>
@@ -34,7 +65,19 @@
       <version>2.0.5312</version>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.sonar</groupId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>${commons-logging.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonarsource.sonarqube</groupId>
       <artifactId>sonar-plugin-api</artifactId>
       <version>${sonar.version}</version>
       <scope>provided</scope>
@@ -46,22 +89,32 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.sonar-plugins.java</groupId>
-      <artifactId>sonar-java-plugin</artifactId>
+      <groupId>org.codehaus.staxmate</groupId>
+      <artifactId>staxmate</artifactId>
+      <version>${staxmate.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.6</version>
+    </dependency>
+
     <!-- Lint -->
     <dependency>
       <groupId>com.android.tools.lint</groupId>
       <artifactId>lint</artifactId>
+      <version>${lint.version}</version>
     </dependency>
     <dependency>
       <groupId>com.android.tools.lint</groupId>
       <artifactId>lint-api</artifactId>
+      <version>${lint.version}</version>
     </dependency>
     <dependency>
       <groupId>com.android.tools.lint</groupId>
       <artifactId>lint-checks</artifactId>
+      <version>${lint.version}</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -76,6 +129,7 @@
     <dependency>
       <groupId>org.simpleframework</groupId>
       <artifactId>simple-xml</artifactId>
+      <version>${simplexml.version}</version>
     </dependency>
 
 
@@ -127,13 +181,21 @@
     </resources>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.sonar</groupId>
+        <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
         <artifactId>sonar-packaging-maven-plugin</artifactId>
-        <version>1.13</version>
+        <version>1.16</version>
         <extensions>true</extensions>
         <configuration>
           <!-- To overrides guava -->
           <useChildFirstClassLoader>true</useChildFirstClassLoader>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>8</source>
+          <target>8</target>
         </configuration>
       </plugin>
     </plugins>

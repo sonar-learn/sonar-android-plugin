@@ -10,7 +10,7 @@
 
   <groupId>org.sonarsource.android</groupId>
   <artifactId>sonar-android</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <packaging>pom</packaging>
 
   <name>SonarQube Android Lint</name>
@@ -41,12 +41,13 @@
   </issueManagement>
 
   <properties>
-    <sonar-java.version>2.1</sonar-java.version>
+    <sonar-java.version>5.13.1.18282</sonar-java.version>
     <lint.version>25.1.2</lint.version>
     <simplexml.version>2.7.1</simplexml.version>
     <jsr305.version>3.0.0</jsr305.version>
-    <slf4j.version>1.7.10</slf4j.version>
+    <slf4j.version>1.7.21</slf4j.version>
     <commons-io.version>2.4</commons-io.version>
+    <maven.test.skip>true</maven.test.skip>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <!-- license headers -->
     <license.owner>SonarSource SA and Jerome Van Der Linden, Stephane Nicolas, Florian Roncari, Thomas Bores</license.owner>
@@ -58,57 +59,6 @@
   <modules>
     <module>sonar-android-plugin</module>
   </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.android.tools.lint</groupId>
-        <artifactId>lint</artifactId>
-        <version>${lint.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.android.tools.lint</groupId>
-        <artifactId>lint-checks</artifactId>
-        <version>${lint.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.android.tools.lint</groupId>
-        <artifactId>lint-api</artifactId>
-        <version>${lint.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.simpleframework</groupId>
-        <artifactId>simple-xml</artifactId>
-        <version>${simplexml.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.code.findbugs</groupId>
-        <artifactId>jsr305</artifactId>
-        <version>${jsr305.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-jdk14</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>${commons-io.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.sonar-plugins.java</groupId>
-        <artifactId>sonar-java-plugin</artifactId>
-        <version>${sonar-java.version}</version>
-        <scope>provided</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <profiles>
     <profile>

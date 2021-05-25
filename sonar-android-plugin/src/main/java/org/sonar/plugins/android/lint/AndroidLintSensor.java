@@ -21,13 +21,12 @@ package org.sonar.plugins.android.lint;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.batch.Sensor;
-import org.sonar.api.batch.SensorContext;
+import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.sensor.Sensor;
+import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.fs.FileSystem;
-import org.sonar.api.component.ResourcePerspectives;
-import org.sonar.api.config.Settings;
+import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.profiles.RulesProfile;
-import org.sonar.api.resources.Project;
 import org.sonar.plugins.android.AndroidPlugin;
 
 import java.io.File;
@@ -36,26 +35,30 @@ public class AndroidLintSensor implements Sensor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AndroidLintSensor.class);
 
   private RulesProfile profile;
-  private final ResourcePerspectives perspectives;
   private FileSystem fs;
 
-  private final File lintReport;
-
-  public AndroidLintSensor(Settings settings, RulesProfile profile, ResourcePerspectives perspectives, FileSystem fs) {
+  public AndroidLintSensor(RulesProfile profile, FileSystem fs) {
     this.profile = profile;
-    this.perspectives = perspectives;
     this.fs = fs;
-    this.lintReport = getFile(settings.getString(AndroidPlugin.LINT_REPORT_PROPERTY));
   }
 
   @Override
-  public void analyse(Project project, SensorContext sensorContext) {
-    new AndroidLintProcessor(profile, perspectives, fs).process(lintReport);
+  public void describe(SensorDescriptor descriptor) {
+    descriptor
+            .onlyOnLanguages("java", "xml")
+            .name("AndroidLint")
+            .onlyOnFileType(InputFile.Type.MAIN)
+            .onlyWhenConfiguration(config -> config.hasKey(AndroidPlugin.LINT_REPORT_PROPERTY));
   }
 
   @Override
-  public boolean shouldExecuteOnProject(Project project) {
-    return lintReport != null && lintReport.exists();
+  public void execute(SensorContext context) {
+    File lintReport = getFile(
+            context.config()
+                    .get(AndroidPlugin.LINT_REPORT_PROPERTY)
+                    .orElse(AndroidPlugin.LINT_REPORT_PROPERTY_DEFAULT)
+    );
+    new AndroidLintProcessor(context, profile).process(lintReport);
   }
 
   private File getFile(String path) {

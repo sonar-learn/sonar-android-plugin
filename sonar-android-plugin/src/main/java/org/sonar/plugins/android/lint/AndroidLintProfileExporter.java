@@ -50,7 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 
@@ -163,7 +162,7 @@ public class AndroidLintProfileExporter extends ProfileExporter {
       // No arg constructor used by profile importer
     }
 
-    public LintIssue(String ruleKey, String severity, @Nullable Integer priority) {
+    public LintIssue(String ruleKey, String severity, Integer priority) {
       this.id = ruleKey;
       this.severity = severity;
       this.priority = priority;
