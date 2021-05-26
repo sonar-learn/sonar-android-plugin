@@ -22,6 +22,8 @@
     <slf4j.version>1.7.25</slf4j.version>
     <simplexml.version>2.7.1</simplexml.version>
     <staxmate.version>2.0.1</staxmate.version>
+    <guava.version>13.0.1</guava.version>
+    <commons-lang.version>2.6</commons-lang.version>
     <!-- Configuration for sonar-packaging-maven-plugin -->
     <sonar.pluginClass>org.sonar.plugins.android.AndroidPlugin</sonar.pluginClass>
     <sonar.pluginName>Android Lint</sonar.pluginName>
@@ -34,35 +36,10 @@
       <version>${sslr-squid-bridge.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>org.codehaus.sonar.sslr</groupId>
-          <artifactId>sslr-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.sonar.sslr</groupId>
-          <artifactId>sslr-xpath</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.sonar</groupId>
-          <artifactId>sonar-plugin-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.picocontainer</groupId>
-          <artifactId>picocontainer</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>jcl-over-slf4j</artifactId>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>emma</groupId>
-      <artifactId>emma</artifactId>
-      <version>2.0.5312</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -71,17 +48,15 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>${commons-logging.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.sonarsource.sonarqube</groupId>
       <artifactId>sonar-plugin-api</artifactId>
       <version>${sonar.version}</version>
       <scope>provided</scope>
       <exclusions>
+        <exclusion>
+          <groupId>commons-lang</groupId>
+          <artifactId>commons-lang</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
@@ -93,11 +68,17 @@
       <artifactId>staxmate</artifactId>
       <version>${staxmate.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
+      <version>${commons-lang.version}</version>
     </dependency>
 
     <!-- Lint -->
@@ -105,31 +86,50 @@
       <groupId>com.android.tools.lint</groupId>
       <artifactId>lint</artifactId>
       <version>${lint.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.android.tools.lint</groupId>
       <artifactId>lint-api</artifactId>
       <version>${lint.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.android.tools.lint</groupId>
       <artifactId>lint-checks</artifactId>
       <version>${lint.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok.ast</artifactId>
-      <version>0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>13.0.1</version>
+      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>org.simpleframework</groupId>
       <artifactId>simple-xml</artifactId>
       <version>${simplexml.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
 
@@ -185,10 +185,41 @@
         <artifactId>sonar-packaging-maven-plugin</artifactId>
         <version>1.16</version>
         <extensions>true</extensions>
-        <configuration>
-          <!-- To overrides guava -->
-          <useChildFirstClassLoader>true</useChildFirstClassLoader>
-        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <minimizeJar>true</minimizeJar>
+              <filters>
+                <filter>
+                  <artifact>jaxen:jaxen</artifact>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/LICENSE*</exclude>
+                    <exclude>META-INF/NOTICE*</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>LICENSE*</exclude>
+                    <exclude>NOTICE*</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
