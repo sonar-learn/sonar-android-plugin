@@ -21,7 +21,6 @@ package org.sonar.plugins.android;
 
 import org.sonar.api.Plugin;
 import org.sonar.api.Property;
-import org.sonar.plugins.android.lint.AndroidLintProfileExporter;
 import org.sonar.plugins.android.lint.AndroidLintProfileImporter;
 import org.sonar.plugins.android.lint.AndroidLintRulesDefinition;
 import org.sonar.plugins.android.lint.AndroidLintSensor;
@@ -39,14 +38,13 @@ import java.util.Arrays;
   global = false)
 public class AndroidPlugin implements Plugin {
 
-  public static final String LINT_REPORT_PROPERTY = "sonar.android.lint.report";
+  public static final String LINT_REPORT_PROPERTY = "sonar.androidLint.reportPaths";
   public static final String LINT_REPORT_PROPERTY_DEFAULT = "build/outputs/lint-results.xml";
 
   @Override
   public void define(Context context) {
     context.addExtensions(
             Arrays.asList(
-                    AndroidLintProfileExporter.class,
                     AndroidLintProfileImporter.class,
                     AndroidLintRulesDefinition.class,
                     AndroidLintSensor.class,
