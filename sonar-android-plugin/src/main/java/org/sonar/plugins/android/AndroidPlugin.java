@@ -38,8 +38,8 @@ import java.util.Arrays;
   global = false)
 public class AndroidPlugin implements Plugin {
 
-  public static final String LINT_REPORT_PROPERTY = "sonar.androidLint.reportPaths";
-  public static final String LINT_REPORT_PROPERTY_DEFAULT = "build/outputs/lint-results.xml";
+  public static final String LINT_REPORT_PROPERTY = "sonar.android.lint.report";
+  public static final String LINT_REPORT_PROPERTY_DEFAULT = "build/reports/lint-results.xml";
 
   @Override
   public void define(Context context) {

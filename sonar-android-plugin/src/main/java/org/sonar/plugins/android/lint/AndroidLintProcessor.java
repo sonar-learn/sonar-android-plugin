@@ -29,9 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;
-import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.rule.RuleKey;
-import org.sonar.api.rules.ActiveRule;
 
 import java.io.File;
 import java.util.List;
@@ -40,11 +38,9 @@ public class AndroidLintProcessor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AndroidLintProcessor.class);
   private final SensorContext context;
-  private final RulesProfile profile;
 
-  public AndroidLintProcessor(SensorContext context, RulesProfile profile) {
+  public AndroidLintProcessor(SensorContext context) {
     this.context = context;
-    this.profile = profile;
   }
 
   public void process(File lintXml) {
@@ -61,27 +57,22 @@ public class AndroidLintProcessor {
   }
 
   private void processIssue(LintIssue lintIssue) {
-    ActiveRule rule = profile.getActiveRule(AndroidLintRulesDefinition.REPOSITORY_KEY, lintIssue.id);
-    if (rule != null) {
-      LOGGER.debug("Processing Issue: {}", lintIssue.id);
-      for (LintLocation lintLocation : lintIssue.locations) {
-        processIssueForLocation(rule, lintIssue, lintLocation);
-      }
-    } else {
-      LOGGER.warn("Unable to find rule for {}", lintIssue.id);
+    LOGGER.debug("Processing Issue: {}", lintIssue.id);
+    for (LintLocation lintLocation : lintIssue.locations) {
+      processIssueForLocation(lintIssue, lintLocation);
     }
   }
 
-  private void processIssueForLocation(ActiveRule rule, LintIssue lintIssue, LintLocation lintLocation) {
+  private void processIssueForLocation(LintIssue lintIssue, LintLocation lintLocation) {
     InputFile inputFile = this.context.fileSystem().inputFile(this.context.fileSystem().predicates().hasPath(lintLocation.file));
     if (inputFile != null) {
       LOGGER.debug("Processing File {} for Issue {}", lintLocation.file, lintIssue.id);
       DefaultIssueLocation dil = new DefaultIssueLocation()
               .on(inputFile)
-              .at(inputFile.selectLine(lintLocation.line))
+              .at(inputFile.selectLine(lintLocation.line != null ? lintLocation.line : 1))
               .message(lintIssue.message);
       this.context.newIssue()
-              .forRule(RuleKey.of(rule.getRepositoryKey(), rule.getRuleKey()))
+              .forRule(RuleKey.of(AndroidLintRulesDefinition.REPOSITORY_KEY, lintIssue.id))
               .at(dil)
               .save();
       return;

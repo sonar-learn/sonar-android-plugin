@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
-import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.sensor.SensorDescriptor;
-import org.sonar.api.profiles.RulesProfile;
 import org.sonar.plugins.android.AndroidPlugin;
 
 import java.io.File;
@@ -34,12 +32,10 @@ import java.io.File;
 public class AndroidLintSensor implements Sensor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AndroidLintSensor.class);
 
-  private RulesProfile profile;
-  private FileSystem fs;
+  private final SensorContext context;
 
-  public AndroidLintSensor(RulesProfile profile, FileSystem fs) {
-    this.profile = profile;
-    this.fs = fs;
+  public AndroidLintSensor(SensorContext context) {
+    this.context = context;
   }
 
   @Override
@@ -58,14 +54,14 @@ public class AndroidLintSensor implements Sensor {
                     .get(AndroidPlugin.LINT_REPORT_PROPERTY)
                     .orElse(AndroidPlugin.LINT_REPORT_PROPERTY_DEFAULT)
     );
-    new AndroidLintProcessor(context, profile).process(lintReport);
+    new AndroidLintProcessor(context).process(lintReport);
   }
 
   private File getFile(String path) {
     try {
       File file = new File(path);
       if (!file.isAbsolute()) {
-        file = new File(fs.baseDir(), path).getCanonicalFile();
+        file = new File(this.context.fileSystem().baseDir(), path).getCanonicalFile();
       }
       return file;
     } catch (Exception e) {
